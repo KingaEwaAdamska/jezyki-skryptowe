@@ -11,6 +11,8 @@ def handle_sentence(sentence):
             if c == ",":
                 commas += 1
 
+        # czy jeden przecinek to już zdanie podrzene? - nie wiem bo mature cudem zdałem xd
+        # jak nie to można zmienić na >= 2
         if commas >= 1:
             print(sentence)
             found = True
