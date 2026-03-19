@@ -8,7 +8,7 @@ def count(c):
         characters += 1
 
 def main():
-    utils.process_sentences(on_char=count)
+    utils.process_text(on_char=count)
     print(characters)
 
 

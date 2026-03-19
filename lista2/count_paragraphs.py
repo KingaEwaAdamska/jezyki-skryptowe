@@ -7,7 +7,7 @@ def count():
     paragraphs += 1
 
 def main():
-    utils.process_sentences(on_paragraph=count)
+    utils.process_text(on_paragraph=count)
     print(paragraphs)
 
 

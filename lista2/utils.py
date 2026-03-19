@@ -1,6 +1,6 @@
 import sys
 
-def process_sentences(on_sentence=None, on_paragraph=None, on_char=None):
+def process_text(on_sentence=None, on_paragraph=None, on_char=None):
     sentence = ""
     in_empty_space = False
     

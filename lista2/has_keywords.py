@@ -23,7 +23,7 @@ def handle_sentence(sentence):
         print(sentence)
 
 def main():
-    utils.process_sentences(on_sentence=handle_sentence)
+    utils.process_text(on_sentence=handle_sentence)
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ def handle_sentence(sentence):
         sentences_with_pn += 1
 
 def main():
-    utils.process_sentences(on_sentence=handle_sentence)
+    utils.process_text(on_sentence=handle_sentence)
     result = sentences_with_pn / total_sentences
     sys.stdout.write(str(result) + "\n")
 
