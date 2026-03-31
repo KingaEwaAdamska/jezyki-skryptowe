@@ -15,8 +15,8 @@ from utils import (
 
 def convert_file(input_path, output_path, file_type):
     if file_type == "image":
-        cmd = ["magick", input_path, output_path]
-        program = "magick"
+        cmd = ["convert", input_path, output_path]
+        program = "convert"
     else:
         cmd = ["ffmpeg", "-y", "-i", input_path, output_path]
         program = "ffmpeg"
