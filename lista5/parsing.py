@@ -14,7 +14,7 @@ def parse_measurements(file_path):
         return measurements
 
 def parse_station_metadata(file_path):
-    Station = namedtuple('Station', ['id', 'name', 'city', 'voivodeship', 'address', 'latitude', 'longitude'])
+    Station = namedtuple('Station', ['id', 'name', 'city', 'voivodeship', 'address', 'latitude', 'longitude', 'date_opened', 'date_closed', 'station_type'])
     with open(file_path, mode='r', newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)
         stations = []
@@ -24,7 +24,10 @@ def parse_station_metadata(file_path):
             city = row['Miejscowość']
             address = row['Adres']
             voivodeship = row['Województwo']
-            latitude = float(row['WGS84 φ N'])
-            longitude = float(row['WGS84 λ E'])
-            stations.append(Station(id, name, city, voivodeship, address, latitude, longitude))
+            latitude = row['WGS84 φ N']
+            longitude = row['WGS84 λ E']
+            date_opened = row['Data uruchomienia']
+            date_closed = row['Data zamknięcia']
+            station_type = row['Rodzaj stacji']
+            stations.append(Station(id, name, city, voivodeship, address, latitude, longitude, date_opened, date_closed, station_type))
         return stations
