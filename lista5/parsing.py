@@ -1,37 +1,57 @@
 import csv
 import re
+import logging
 from collections import namedtuple
+
+logger = logging.getLogger(__name__)
 
 def parse_measurements(file_path):
     Measurement = namedtuple('Measurement', ['timestamp', 'value'])
-    with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        next(reader)  # Pomijamy nagłówek
-        measurements = []
-        for row in reader:
-            timestamp = row[0]
-            value = row[1]  # Zakładamy, że pomiar znajduje się w 2. kolumnie
-            measurements.append(Measurement(timestamp, value))
+    logger.info(f"Otwarcie pliku: {file_path}")
+    try:
+        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            next(reader)  # Pomijamy nagłówek
+            measurements = []
+            for row in reader:
+                timestamp = row[0]
+                value = row[1]  # Zakładamy, że pomiar znajduje się w 2. kolumnie
+                row_bytes = sum(len(str(cell).encode('utf-8')) for cell in row)
+                logger.debug(f"Przeczytanych bajtów: {row_bytes}")
+                measurements.append(Measurement(timestamp, value))
+        logger.info(f"Zamknięcie pliku: {file_path}")
         return measurements
+    except FileNotFoundError:
+        logger.error(f"Plik nie istnieje: {file_path}")
+        raise
 
 def parse_station_metadata(file_path):
     Station = namedtuple('Station', ['id', 'name', 'city', 'voivodeship', 'address', 'latitude', 'longitude', 'date_opened', 'date_closed', 'station_type'])
-    with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        stations = []
-        for row in reader:
-            id = row['Kod stacji']
-            name = row['Nazwa stacji']
-            city = row['Miejscowość']
-            address = row['Adres']
-            voivodeship = row['Województwo']
-            latitude = row['WGS84 φ N']
-            longitude = row['WGS84 λ E']
-            date_opened = row['Data uruchomienia']
-            date_closed = row['Data zamknięcia']
-            station_type = row['Rodzaj stacji']
-            stations.append(Station(id, name, city, voivodeship, address, latitude, longitude, date_opened, date_closed, station_type))
+    logger.info(f"Otwarcie pliku: {file_path}")
+    try:
+        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            stations = []
+            for row in reader:
+                id = row['Kod stacji']
+                name = row['Nazwa stacji']
+                city = row['Miejscowość']
+                address = row['Adres']
+                voivodeship = row['Województwo']
+                latitude = row['WGS84 φ N']
+                longitude = row['WGS84 λ E']
+                date_opened = row['Data uruchomienia']
+                date_closed = row['Data zamknięcia']
+                station_type = row['Rodzaj stacji']
+                row_data = [id, name, city, voivodeship, address, latitude, longitude, date_opened, date_closed, station_type]
+                row_bytes = sum(len(str(cell).encode('utf-8')) for cell in row_data)
+                logger.debug(f"Przeczytanych bajtów: {row_bytes}")
+                stations.append(Station(id, name, city, voivodeship, address, latitude, longitude, date_opened, date_closed, station_type))
+        logger.info(f"Zamknięcie pliku: {file_path}")
         return stations
+    except FileNotFoundError:
+        logger.error(f"Plik nie istnieje: {file_path}")
+        raise
 
 
 def parse_measurements_wide(file_path):
@@ -46,10 +66,19 @@ def parse_measurements_wide(file_path):
     def _is_datetime(text):
         return bool(text and datetime_pattern.match(text.strip()))
 
-    with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-        reader = list(csv.reader(file))
+    logger.info(f"Otwarcie pliku: {file_path}")
+    try:
+        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+            reader = list(csv.reader(file))
+            for row in reader:
+                row_bytes = sum(len(str(cell).encode('utf-8')) for cell in row)
+                logger.debug(f"Przeczytanych bajtów: {row_bytes}")
+    except FileNotFoundError:
+        logger.error(f"Plik nie istnieje: {file_path}")
+        raise
 
     if len(reader) < 2:
+        logger.warning(f"Plik {file_path} ma mniej niż 2 wiersze (pusty lub nieprawidłowy format)")
         return None
 
     metadata_rows = {
@@ -138,4 +167,5 @@ def parse_measurements_wide(file_path):
             )
         )
 
+    logger.info(f"Zamknięcie pliku: {file_path}")
     return stations
