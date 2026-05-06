@@ -232,16 +232,20 @@ def stats(
     print(f"Odchylenie standardowe: {std_dev:.6f}")
 
 @app.command()
-def detect_anomalies(file_path: str):
-    measurements = parse_measurements(file_path)
-    anomalies = a.detect_anomalies(measurements)
+def detect_anomalies(file_path: str, delta_threshold: float = 50, alarm_threshold: float = 500, zero_threshold: int = 5):
+    stations = parse_measurements(file_path)
+    if not stations:
+        typer.echo("Brak danych do analizy.")
+        raise typer.Exit()
 
-    if anomalies:
-        print("Wykryte anomalie:")
-        for anomaly in anomalies:
-            print(anomaly)
-    else:
-        print("Brak wykrytych anomalii.")
+    for station in stations:
+        anomalies = a.detect_anomalies(station.measurements, alarm_threshold, delta_threshold, zero_threshold)
+        if anomalies:
+            typer.echo(f"Anomalie dla stacji {station.station_code}:")
+            for anomaly in anomalies:
+                typer.echo(f" - {anomaly}")
+        else:
+            typer.echo(f"Brak anomalii dla stacji {station.station_code}")
 
 if __name__ == "__main__":
     app()
