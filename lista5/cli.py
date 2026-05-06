@@ -6,7 +6,7 @@ import logging
 import statistics
 from datetime import datetime
 
-from parsing import parse_station_metadata, parse_measurements_wide
+from parsing import parse_station_metadata, parse_measurements
 from files import group_measurement_files_by_key
 
 
@@ -100,7 +100,7 @@ def parse_measurement_timestamp(timestamp):
 
 
 def get_active_codes_from_file(file_path, start_date, end_date):
-    data = parse_measurements_wide(file_path)
+    data = parse_measurementse(file_path)
     if not data:
         return set()
 
@@ -116,7 +116,7 @@ def get_active_codes_from_file(file_path, start_date, end_date):
 
 
 def get_station_measurements_in_range(file_path, station_code, start_date, end_date):
-    data = parse_measurements_wide(file_path)
+    data = parse_measurements(file_path)
     if not data:
         return []
 
