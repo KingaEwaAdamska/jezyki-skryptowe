@@ -65,6 +65,7 @@ def valid_measurement(measurement_str):
         "Pb(PM10)",
         "PM10",
         "PM25",
+        # "PM2225", # for testing
         "PrekursoryZielonka",
         "SO2",
     }
@@ -100,7 +101,7 @@ def parse_measurement_timestamp(timestamp):
 
 
 def get_active_codes_from_file(file_path, start_date, end_date):
-    data = parse_measurementse(file_path)
+    data = parse_measurements(file_path)
     if not data:
         return set()
 
