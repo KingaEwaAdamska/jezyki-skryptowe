@@ -5,10 +5,10 @@ def group_measurement_files_by_key(directory):
     dir = Path(directory)
     result = {}
 
+    pattern = re.compile(r"(\d{4})_(.+?)_(.+)\.csv")
     for file in dir.iterdir():
         if not file.is_file():
             continue
-        pattern = re.compile(r"(\d{4})_(.+?)_(.+)\.csv")
         match = pattern.match(file.name)
         if match:
             year = match.group(1)

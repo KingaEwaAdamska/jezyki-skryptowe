@@ -19,6 +19,8 @@ def zadanie4(file='data/stacje.csv'):
     all_dates = []
     all_coords = []
     two_part_stations = []
+    transformed_names = []
+    all_mobile_stations_are_mob = True
     three_part_stations = []
     all_street_addresses = []
     
@@ -35,9 +37,11 @@ def zadanie4(file='data/stacje.csv'):
             two_part_stations.append(station.name)
 
         name_transformed = re.sub(r' ', '_', station.name).translate(pl_to_en)
+        transformed_names.append(name_transformed)
         
         if pattern_mob.match(station.id) and station.station_type.lower() != 'mobilna':
-            print(f"Stacja {station.id} ma typ '{station.station_type}', ale jej ID sugeruje, że powinna być typu 'Mobilna'.")
+            all_mobile_stations_are_mob = False
+            # print(f"Stacja {station.id} ma typ '{station.station_type}', ale jej ID sugeruje, że powinna być typu 'Mobilna'.")
 
         if pattern_3_parts.match(station.address):
             three_part_stations.append(station.address)
@@ -49,6 +53,9 @@ def zadanie4(file='data/stacje.csv'):
     # print(f"Wszystkie znalezione współrzędne: {all_coords}")
     # print(f"Stacje z nazwą składającą się z dwóch części: {two_part_stations}")
     # print(f"Stacje z adresem składającym się z trzech części: {three_part_stations}")
-    print(f"Wszystkie adresy uliczne: {all_street_addresses}")
+    # print(f"Wszystkie adresy uliczne: {all_street_addresses}")
+
+    return (all_dates, all_coords, two_part_stations, transformed_names, all_mobile_stations_are_mob, three_part_stations, all_street_addresses)
+
 if __name__ == '__main__':
     zadanie4()
