@@ -5,26 +5,6 @@ from collections import namedtuple
 
 logger = logging.getLogger(__name__)
 
-def parse_measurements(file_path):
-    Measurement = namedtuple('Measurement', ['timestamp', 'value'])
-    logger.info(f"Otwarcie pliku: {file_path}")
-    try:
-        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-            reader = csv.reader(file)
-            next(reader)  # Pomijamy nagłówek
-            measurements = []
-            for row in reader:
-                timestamp = row[0]
-                value = row[1]  # Zakładamy, że pomiar znajduje się w 2. kolumnie
-                row_bytes = sum(len(str(cell).encode('utf-8')) for cell in row)
-                logger.debug(f"Przeczytanych bajtów: {row_bytes}")
-                measurements.append(Measurement(timestamp, value))
-        logger.info(f"Zamknięcie pliku: {file_path}")
-        return measurements
-    except FileNotFoundError:
-        logger.error(f"Plik nie istnieje: {file_path}")
-        raise
-
 def parse_station_metadata(file_path):
     Station = namedtuple('Station', ['id', 'name', 'city', 'voivodeship', 'address', 'latitude', 'longitude', 'date_opened', 'date_closed', 'station_type'])
     logger.info(f"Otwarcie pliku: {file_path}")
@@ -54,7 +34,7 @@ def parse_station_metadata(file_path):
         raise
 
 
-def parse_measurements_wide(file_path):
+def parse_measurements(file_path):
     Measurement = namedtuple('Measurement', ['timestamp', 'value'])
     StationMeasurements = namedtuple(
         'StationMeasurements',
