@@ -244,3 +244,42 @@ class Measurements:
                 result.extend(series)
 
         return result
+
+    def detect_all_anomalies(self, validators: list[SeriesValidator], preload: bool = False) -> dict[str, listr[str]]:
+        results: dict[str, list[str]] = {}
+
+        series_to_validate: list[TimeSeries] = []
+
+        if preload:
+            for file_idx in range(len(self.file_metadata)):
+                loaded_series = self._load_file_data(file_idx)
+                series_to_validate.extend(loaded_series)
+        else: 
+            for cache_entry in self._cache.values():
+                if cache_entry["full"] is not None:
+                    series_to_validate.extend(cache_entry["full"])
+                else:
+                    series_to_validate.extend(cache_entry["stations"].values())
+                for series_list in cache_entry["parameters"].values():
+                    series_to_validate.extenda(series_list)
+            unique_series: list[TimeSeries] = []
+            seen_ids: set[int] = set()
+
+        for series in series_to_validate:
+            sid = id(series)
+
+            if sid not in seen_ids:
+                seen_ids.add(sid)
+                unique_series.append(series)
+        
+            for series in unique_series:
+                series_key = (
+                    f"{series.station_code} | {series.indicator} | {series.averaging_time}" 
+                )
+
+                anomalies: list[str] = []
+
+            for validator in validators:
+                anomalies.extend(validators.analyze(series))
+
+        
