@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from timeseries import TimeSeries
+from detectors import OutlierDetector, ZeroSpikeDetector, ThresholdDetector, SimpleReporter
 
 
 class Measurements:
@@ -260,10 +261,11 @@ class Measurements:
                     series_to_validate.extend(cache_entry["full"])
                 else:
                     series_to_validate.extend(cache_entry["stations"].values())
-                for series_list in cache_entry["parameters"].values():
-                    series_to_validate.extenda(series_list)
-            unique_series: list[TimeSeries] = []
-            seen_ids: set[int] = set()
+                    for series_list in cache_entry["parameters"].values():
+                        series_to_validate.extenda(series_list)
+
+        unique_series: list[TimeSeries] = []
+        seen_ids: set[int] = set()
 
         for series in series_to_validate:
             sid = id(series)
@@ -272,14 +274,27 @@ class Measurements:
                 seen_ids.add(sid)
                 unique_series.append(series)
         
-            for series in unique_series:
-                series_key = (
-                    f"{series.station_code} | {series.indicator} | {series.averaging_time}" 
-                )
+        anomalies: list[str] = []
 
-                anomalies: list[str] = []
+        for serie in unique_series:
+            serie_key = (f"{serie.station_code} | {serie.indicator} | {serie.averaging_time}")
 
             for validator in validators:
-                anomalies.extend(validators.analyze(series))
+                anomalies.extend(validator.analyze(serie))
 
-        
+            if anomalies:
+                results[serie_key] = anomalies
+
+        return results
+
+
+def main():
+    m = Measurements("../lista5/data/measurements")
+    validators = [OutlierDetector(k=3), ZeroSpikeDetector(), ThresholdDetector(threshold=25), SimpleReporter()]
+    print(m.detect_all_anomalies(validators, preload=False))
+    m.get_by_station(station_code="DsWrocWybCon")
+    print(m.detect_all_anomalies(validators, preload=False))
+    print(m.detect_all_anomalies(validators, preload=True))
+
+if __name__ == "__main__":
+    main()
