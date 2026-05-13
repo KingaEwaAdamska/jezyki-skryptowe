@@ -276,17 +276,36 @@ class Measurements:
         
         anomalies: list[str] = []
 
-        for serie in unique_series:
-            serie_key = (f"{serie.station_code} | {serie.indicator} | {serie.averaging_time}")
+        for series in unique_series:
+            series_key = (f"{series.station_code} | {series.indicator} | {series.averaging_time}")
 
             for validator in validators:
-                anomalies.extend(validator.analyze(serie))
+                anomalies.extend(validator.analyze(series))
 
             if anomalies:
-                results[serie_key] = anomalies
+                results[series_key] = anomalies
 
         return results
 
+def example():
+    ts = TimeSeries(
+        indicator="PM10",
+        station_code="TEST",
+        averaging_time="1h",
+        datetimes=[datetime.now()],
+        values=[10.0],
+        unit="ug/m3"
+    )
+
+    analyzers = [
+        OutlierDetector(k=3),
+        ZeroSpikeDetector(),
+        ThresholdDetector(threshold=25),
+        SimpleReporter()
+    ]
+
+    for a in analyzers:
+        print(a.analyze(ts))
 
 def main():
     m = Measurements("../lista5/data/measurements")
