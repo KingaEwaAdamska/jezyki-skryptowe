@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from lista6.timeseries import TimeSeries
+from timeseries import TimeSeries
 
 
 class SeriesValidator(ABC):
@@ -60,3 +60,10 @@ class ThresholdDetector(SeriesValidator):
                     f"Threshold exceeded at {datetime}: {value} > {self.threshold}"
                 )
         return alerts
+
+class SimpleReporter():
+    def analyze(self, series: TimeSeries) -> list[str]:
+        result: list[str] = []
+        result.append(f"Info: {series.indicator} at {series.station_code} has mean = {series.mean}")
+        return result
+

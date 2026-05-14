@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from timeseries import TimeSeries
+from detectors import OutlierDetector, ZeroSpikeDetector, ThresholdDetector, SimpleReporter
 
 
 class Measurements:
@@ -244,3 +245,75 @@ class Measurements:
                 result.extend(series)
 
         return result
+
+    def detect_all_anomalies(self, validators: list[SeriesValidator], preload: bool = False) -> dict[str, listr[str]]:
+        results: dict[str, list[str]] = {}
+
+        series_to_validate: list[TimeSeries] = []
+
+        if preload:
+            for file_idx in range(len(self.file_metadata)):
+                loaded_series = self._load_file_data(file_idx)
+                series_to_validate.extend(loaded_series)
+        else: 
+            for cache_entry in self._cache.values():
+                if cache_entry["full"] is not None:
+                    series_to_validate.extend(cache_entry["full"])
+                else:
+                    series_to_validate.extend(cache_entry["stations"].values())
+                    for series_list in cache_entry["parameters"].values():
+                        series_to_validate.extenda(series_list)
+
+        unique_series: list[TimeSeries] = []
+        seen_ids: set[int] = set()
+
+        for series in series_to_validate:
+            sid = id(series)
+
+            if sid not in seen_ids:
+                seen_ids.add(sid)
+                unique_series.append(series)
+        
+        anomalies: list[str] = []
+
+        for series in unique_series:
+            series_key = (f"{series.station_code} | {series.indicator} | {series.averaging_time}")
+
+            for validator in validators:
+                anomalies.extend(validator.analyze(series))
+
+            if anomalies:
+                results[series_key] = anomalies
+
+        return results
+
+def example():
+    ts = TimeSeries(
+        indicator="PM10",
+        station_code="TEST",
+        averaging_time="1h",
+        datetimes=[datetime.now()],
+        values=[10.0],
+        unit="ug/m3"
+    )
+
+    analyzers = [
+        OutlierDetector(k=3),
+        ZeroSpikeDetector(),
+        ThresholdDetector(threshold=25),
+        SimpleReporter()
+    ]
+
+    for a in analyzers:
+        print(a.analyze(ts))
+
+def main():
+    m = Measurements("../lista5/data/measurements")
+    validators = [OutlierDetector(k=3), ZeroSpikeDetector(), ThresholdDetector(threshold=25), SimpleReporter()]
+    print(m.detect_all_anomalies(validators, preload=False))
+    m.get_by_station(station_code="DsWrocWybCon")
+    print(m.detect_all_anomalies(validators, preload=False))
+    print(m.detect_all_anomalies(validators, preload=True))
+
+if __name__ == "__main__":
+    main()
