@@ -12,12 +12,7 @@ from lista8.log_parser import (
     get_entry_display_text,
     get_status_color,
 )
-
-try:
-    from tkcalendar import DateEntry
-    _HAS_DATE_PICKER = True
-except ImportError:
-    _HAS_DATE_PICKER = False
+from tkcalendar import DateEntry
 
 
 class LogBrowserApp:
@@ -36,7 +31,6 @@ class LogBrowserApp:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(2, weight=1)
 
-        # Top bar: file path + Open button
         top = ttk.Frame(self.root, padding=(8, 8, 8, 4))
         top.grid(row=0, column=0, sticky="ew")
         top.columnconfigure(0, weight=1)
@@ -45,38 +39,29 @@ class LogBrowserApp:
         ttk.Entry(top, textvariable=self.path_var).grid(row=0, column=0, sticky="ew", padx=(0, 6))
         ttk.Button(top, text="Open", command=self._open_file).grid(row=0, column=1)
 
-        # Filter bar: From / To dates
         fbar = ttk.Frame(self.root, padding=(8, 2, 8, 4))
         fbar.grid(row=1, column=0, sticky="ew")
 
         ttk.Label(fbar, text="From").pack(side=tk.LEFT)
         self.from_var = tk.StringVar()
-        if _HAS_DATE_PICKER:
-            DateEntry(fbar, textvariable=self.from_var, date_pattern="yyyy-mm-dd", width=12).pack(
-                side=tk.LEFT, padx=(3, 10)
-            )
-        else:
-            ttk.Entry(fbar, textvariable=self.from_var, width=12).pack(side=tk.LEFT, padx=(3, 10))
+        DateEntry(fbar, textvariable=self.from_var, date_pattern="yyyy-mm-dd", width=12).pack(
+            side=tk.LEFT, padx=(3, 10)
+        )
 
         ttk.Label(fbar, text="To").pack(side=tk.LEFT)
         self.to_var = tk.StringVar()
-        if _HAS_DATE_PICKER:
-            DateEntry(fbar, textvariable=self.to_var, date_pattern="yyyy-mm-dd", width=12).pack(
-                side=tk.LEFT, padx=(3, 10)
-            )
-        else:
-            ttk.Entry(fbar, textvariable=self.to_var, width=12).pack(side=tk.LEFT, padx=(3, 10))
+        DateEntry(fbar, textvariable=self.to_var, date_pattern="yyyy-mm-dd", width=12).pack(
+            side=tk.LEFT, padx=(3, 10)
+        )
 
         ttk.Button(fbar, text="Filter", command=self._apply_filter).pack(side=tk.LEFT, padx=(0, 4))
         ttk.Button(fbar, text="Reset", command=self._reset_filter).pack(side=tk.LEFT)
 
-        # Content area: master list (left) + detail panel (right)
         content = ttk.Frame(self.root, padding=(8, 4, 8, 4))
         content.grid(row=2, column=0, sticky="nsew")
         content.rowconfigure(0, weight=1)
         content.columnconfigure(0, weight=1)
 
-        # Master list
         master_frame = ttk.Frame(content)
         master_frame.grid(row=0, column=0, sticky="nsew")
         master_frame.rowconfigure(0, weight=1)
@@ -95,15 +80,12 @@ class LogBrowserApp:
         scrollbar.grid(row=0, column=1, sticky="ns")
         self.listbox.bind("<<ListboxSelect>>", self._on_select)
 
-        # Separator
         ttk.Separator(content, orient=tk.VERTICAL).grid(row=0, column=1, sticky="ns", padx=8)
 
-        # Detail panel
         detail = ttk.Frame(content, padding=(0, 4))
         detail.grid(row=0, column=2, sticky="n")
         self._build_detail(detail)
 
-        # Bottom navigation: Previous / Next
         nav = ttk.Frame(self.root, padding=(8, 4, 8, 8))
         nav.grid(row=3, column=0, sticky="ew")
 
@@ -130,7 +112,6 @@ class LogBrowserApp:
         row(0, "Remote host", self.remote_host_var)
         row(1, "Date", self.date_var)
 
-        # Time + Timezone on same row
         ttk.Label(parent, text="Time").grid(row=2, column=0, sticky="w", pady=4, padx=(0, 10))
         ttk.Entry(parent, textvariable=self.time_var, state="readonly", width=10).grid(
             row=2, column=1, sticky="w", pady=4
@@ -140,7 +121,6 @@ class LogBrowserApp:
             row=2, column=3, sticky="w", pady=4
         )
 
-        # Status code circle + Method on same row
         ttk.Label(parent, text="Status code:").grid(row=3, column=0, sticky="w", pady=4, padx=(0, 10))
         sc_frame = ttk.Frame(parent)
         sc_frame.grid(row=3, column=1, sticky="w", pady=4)
@@ -156,13 +136,11 @@ class LogBrowserApp:
             row=3, column=3, sticky="w", pady=4
         )
 
-        # Resource
         ttk.Label(parent, text="Resource:").grid(row=4, column=0, sticky="w", pady=4, padx=(0, 10))
         ttk.Entry(parent, textvariable=self.resource_var, state="readonly", width=32).grid(
             row=4, column=1, columnspan=3, sticky="ew", pady=4
         )
 
-        # Size
         ttk.Label(parent, text="Size").grid(row=5, column=0, sticky="w", pady=4, padx=(0, 10))
         ttk.Label(parent, textvariable=self.size_var).grid(
             row=5, column=1, columnspan=3, sticky="w", pady=4
@@ -170,7 +148,7 @@ class LogBrowserApp:
 
         parent.columnconfigure(1, weight=1)
 
-    # --- File loading ---
+    # --- file loading ---
 
     def _open_file(self):
         path = self.path_var.get().strip()
@@ -206,7 +184,7 @@ class LogBrowserApp:
         self.from_var.set(min(dates).strftime("%Y-%m-%d"))
         self.to_var.set(max(dates).strftime("%Y-%m-%d"))
 
-    # --- Filtering ---
+    # --- filtering ---
 
     def _apply_filter(self):
         try:
@@ -226,7 +204,7 @@ class LogBrowserApp:
         self._set_default_dates()
         self._populate_list()
 
-    # --- List management ---
+    # --- list ---
 
     def _populate_list(self):
         self.listbox.delete(0, tk.END)
@@ -243,7 +221,7 @@ class LogBrowserApp:
             self._show_detail(self.current_index)
             self._update_buttons()
 
-    # --- Detail view ---
+    # --- detail ---
 
     def _show_detail(self, idx):
         if not (0 <= idx < len(self.filtered_entries)):
@@ -271,7 +249,7 @@ class LogBrowserApp:
         self.status_canvas.itemconfig(self._oval, fill="#aaaaaa")
         self.status_canvas.itemconfig(self._oval_text, text="")
 
-    # --- Navigation ---
+    # --- navigation ---
 
     def _prev(self):
         if self.current_index > 0:
