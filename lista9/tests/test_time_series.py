@@ -5,7 +5,7 @@ from timeseries import TimeSeries
 
 
 @pytest.fixture
-def ts():
+def ts() -> TimeSeries:
     return TimeSeries(
         indicator="temp",
         station_code="ST01",
@@ -19,13 +19,13 @@ def ts():
     )
 
 
-def test_getitem_integer_index(ts):
+def test_getitem_integer_index(ts: TimeSeries) -> None:
     result = ts[1]
 
     assert result == (ts.datetimes[1], ts.values[1])
 
 
-def test_getitem_slice(ts):
+def test_getitem_slice(ts: TimeSeries) -> None:
     result = ts[0:2]
 
     expected = list(
@@ -38,7 +38,7 @@ def test_getitem_slice(ts):
     assert result == expected
 
 
-def test_getitem_datetime_existing(ts):
+def test_getitem_datetime_existing(ts: TimeSeries) -> None:
     dt = datetime(2024, 1, 1, 13)
 
     result = ts[dt]
@@ -46,14 +46,14 @@ def test_getitem_datetime_existing(ts):
     assert result == 20.0
 
 
-def test_getitem_datetime_missing(ts):
+def test_getitem_datetime_missing(ts: TimeSeries) -> None:
     dt = datetime(2025, 1, 1, 0)
 
     with pytest.raises(KeyError):
         _ = ts[dt]
 
 
-def test_stats_full_data(ts):
+def test_stats_full_data(ts: TimeSeries) -> None:
 
     assert ts.mean == 20.0
 
@@ -61,7 +61,7 @@ def test_stats_full_data(ts):
     assert ts.stddev == expected_std
 
 
-def test_stats_with_none_values():
+def test_stats_with_none_values() -> None:
     ts = TimeSeries(
         indicator="temp",
         station_code="ST02",
