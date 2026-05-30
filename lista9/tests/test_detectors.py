@@ -3,7 +3,7 @@ from timeseries import TimeSeries
 from detectors import OutlierDetector, ZeroSpikeDetector, ThresholdDetector
 
 
-def test_outlier_detector_detects_outlier():
+def test_outlier_detector_detects_outlier() -> None:
 
     series = TimeSeries(
         indicator="temp",
@@ -52,7 +52,7 @@ def test_outlier_detector_detects_outlier():
     assert "2024-01-07" in result[0]
 
 
-def test_zero_spike_detector_detects_three_consecutive_zeros_or_none():
+def test_zero_spike_detector_detects_three_consecutive_zeros_or_none() -> None:
     series = TimeSeries(
         indicator="temp",
         station_code="ST01",
@@ -78,7 +78,7 @@ def test_zero_spike_detector_detects_three_consecutive_zeros_or_none():
     assert result == []
 
 
-def test_zero_spike_detector_detects_spike():
+def test_zero_spike_detector_detects_spike() -> None:
     series = TimeSeries(
         indicator="temp",
         station_code="ST02",
@@ -101,7 +101,7 @@ def test_zero_spike_detector_detects_spike():
     assert "3 consecutive zeros/missing values" in result[0]
 
 
-def test_zero_spike_detector_detects_spike_at_end():
+def test_zero_spike_detector_detects_spike_at_end() -> None:
     series = TimeSeries(
         indicator="temp",
         station_code="ST03",
@@ -121,7 +121,7 @@ def test_zero_spike_detector_detects_spike_at_end():
     assert any("end of series" in r for r in result)
 
 
-def test_threshold_detector_detects_exceeding_values():
+def test_threshold_detector_detects_exceeding_values() -> None:
     series = TimeSeries(
         indicator="pressure",
         station_code="ST01",
@@ -144,7 +144,7 @@ def test_threshold_detector_detects_exceeding_values():
     assert "100.0" in result[0]
 
 
-def test_threshold_detector_no_exceeding_values():
+def test_threshold_detector_no_exceeding_values() -> None:
     series = TimeSeries(
         indicator="pressure",
         station_code="ST01",

@@ -7,7 +7,7 @@ from detectors import OutlierDetector, ZeroSpikeDetector, SimpleReporter
 
 
 @pytest.fixture
-def mock_series():
+def mock_series() -> list[TimeSeries]:
     return [
         TimeSeries(
             indicator="temp",
@@ -24,7 +24,7 @@ def mock_series():
 
 
 @pytest.fixture
-def empty_measurements():
+def empty_measurements() -> Measurements:
     m = Measurements.__new__(Measurements)
 
     m.file_metadata = []
@@ -47,7 +47,9 @@ def empty_measurements():
         SimpleReporter(),
     ],
 )
-def test_detect_all_anomalies_with_mock_data(empty_measurements, mock_series, analyzer):
+def test_detect_all_anomalies_with_mock_data(
+    empty_measurements: Measurements, mock_series: list[TimeSeries], analyzer: object
+) -> None:
     m = empty_measurements
 
     # wstrzykujemy dane do cache
