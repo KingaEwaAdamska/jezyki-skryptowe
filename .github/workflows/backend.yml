@@ -3,10 +3,10 @@ name: Backend Tests
 on:
   push:
     paths:
-      - "backend/**"
+      - "lista10/backend/**"
   pull_request:
     paths:
-      - "backend/**"
+      - "lista10/backend/**"
 
 jobs:
   test:
@@ -14,7 +14,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./lista10/backend
 
     steps:
       - uses: actions/checkout@v4
