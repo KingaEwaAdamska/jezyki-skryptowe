@@ -1,11 +1,31 @@
-import { MapContainer, TileLayer } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import { BusStopMarker } from '@/components/BusStopMarker'
-import { MOCK_STOPS } from '@/data/mockStops'
+import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { BusStopMarker } from "@/components/BusStopMarker";
+import { useEffect, useState } from "react";
 
-const WROCLAW_CENTER: [number, number] = [51.1079, 17.0385]
+type Stop = {
+  stopId: string;
+  name: string;
+  stopCode?: string;
+  lat: number;
+  lon: number;
+};
 
-export function MapView() {
+const WROCLAW_CENTER: [number, number] = [51.1079, 17.0385];
+
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+
+export function MapView({ refreshKey }: { refreshKey: number }) {
+  const [stops, setStops] = useState<Stop[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/stops`)
+      .then((res) => res.json())
+      .then(setStops)
+      .catch(console.error);
+  }, [refreshKey]);
+
   return (
     <MapContainer
       center={WROCLAW_CENTER}
@@ -14,14 +34,18 @@ export function MapView() {
       zoomControl
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        attribution="&copy; OpenStreetMap contributors & CARTO"
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        subdomains={['a', 'b', 'c', 'd']}
+        subdomains={["a", "b", "c", "d"]}
       />
 
-      {MOCK_STOPS.map((stop) => (
+      {loading && (
+        <div className="absolute z-[1000] text-white">Loading stops...</div>
+      )}
+
+      {stops.map((stop) => (
         <BusStopMarker key={stop.stopId} stop={stop} />
       ))}
     </MapContainer>
-  )
+  );
 }
