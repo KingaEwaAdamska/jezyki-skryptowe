@@ -15,7 +15,7 @@ const WROCLAW_CENTER: [number, number] = [51.1079, 17.0385];
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
-export function MapView({ refreshKey }: { refreshKey: number }) {
+export function MapView() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,8 +23,9 @@ export function MapView({ refreshKey }: { refreshKey: number }) {
     fetch(`${API_URL}/stops`)
       .then((res) => res.json())
       .then(setStops)
-      .catch(console.error);
-  }, [refreshKey]);
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <MapContainer
