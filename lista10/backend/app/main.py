@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.endpoints import router as api_router
 
 app = FastAPI(title="GTFS Timetable API")
 
@@ -10,13 +11,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/")
-def read_root() -> dict[str, str]:
-    return {"status": "ok"}
-
+app.include_router(api_router)
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)

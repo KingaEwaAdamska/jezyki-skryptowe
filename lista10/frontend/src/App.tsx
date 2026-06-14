@@ -1,4 +1,5 @@
 import { MapView } from '@/components/MapView'
+import { FileUpload } from '@/components/FileUpload'
 
 function App() {
   return (
@@ -11,6 +12,8 @@ function App() {
             Rozkład jazdy — Wrocław
           </h1>
           <p className="text-sm text-gray-400">GTFS Timetable Explorer</p>
+          
+          <FileUpload />
         </div>
       </div>
     </div>
