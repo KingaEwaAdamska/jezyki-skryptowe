@@ -1,16 +1,23 @@
 import { Marker, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { divIcon } from "leaflet";
-import type { MockStop } from "@/data/mockStops";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 const stopIcon = divIcon({
   className: "custom-stop-icon",
-  html: '<span class="block h-3 w-3 rounded-full border-2 border-white bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]"></span>',
-  iconSize: [12, 12],
-  iconAnchor: [6, 6],
+  html: '<span class="block h-2 w-2 rounded-full border border-white/70 bg-violet-300 shadow-[0_0_4px_rgba(196,181,253,0.7)]"></span>',
+  iconSize: [8, 8],
+  iconAnchor: [4, 4],
 });
+
+export type StopMarkerData = {
+  stopId: string;
+  name: string;
+  stopCode?: string;
+  lat: number;
+  lon: number;
+};
 
 type StopStats = {
   stopId: string;
@@ -21,7 +28,7 @@ type StopStats = {
   topDirections: { direction: string; count: number }[];
 };
 
-export function BusStopMarker({ stop }: { stop: MockStop }) {
+export function BusStopMarker({ stop }: { stop: StopMarkerData }) {
   const [stats, setStats] = useState<StopStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,13 +120,6 @@ export function BusStopMarker({ stop }: { stop: MockStop }) {
               <p className="text-gray-500 text-sm">Brak danych o kierunkach</p>
             )
           )}
-
-          <div className="border-t border-white/10 pt-2">
-            <p className="text-gray-400">
-              {stop?.customQuery?.label ?? "Custom query"}
-            </p>
-            <p className="text-white">{stop?.customQuery?.value ?? "—"}</p>{" "}
-          </div>
         </div>
       </Popup>
     </Marker>
